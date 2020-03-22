@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
+using System.Runtime.InteropServices;
 
 public class GameManager : MonoBehaviour
 {
@@ -36,6 +37,9 @@ public class GameManager : MonoBehaviour
     public int bluffingInt;
     public int baseReqInt;
 
+    private string csvFileName;
+    private StringBuilder sb;
+
     private DD_DataDiagram m_DataDiagram;
     List<GameObject> lineList = new List<GameObject>();
     private float h = 0;
@@ -58,7 +62,10 @@ public class GameManager : MonoBehaviour
         AddALine();
         AddALine();
 
-        
+        btn_Next.enabled = false;
+        btn_Stop.enabled = false;
+
+        sb = new StringBuilder();
     }
 
     private bool updateSwitch = false;
@@ -80,8 +87,10 @@ public class GameManager : MonoBehaviour
 
     public void Btn_Start_Click()
     {
-        //        HawkManager hawk = gameObject.GetComponentInParent<HawkManager>();
-        //       hawk.isDead = true;
+        btn_Next.enabled = true;
+        btn_Stop.enabled = true;
+        btn_Start.enabled = false;
+
         GameObject hawk = GameObject.Find("Hawk(Clone)");
         while(hawk != null)
         {
@@ -125,6 +134,16 @@ public class GameManager : MonoBehaviour
         injuryInt = System.Convert.ToInt32(injury.text);
         bluffingInt = System.Convert.ToInt32(bluffing.text);
         baseReqInt = System.Convert.ToInt32(baseReq.text);
+
+        sb.Clear();
+
+        sb.Append("Howk").Append(",");
+        sb.Append("Dove").Append(",");
+        sb.Append("Total").Append(",");
+
+        sb.Append(hawkNum.text).Append(",");
+        sb.Append(doveNum.text).Append(",");
+        sb.Append((System.Convert.ToInt32(hawkNum.text) + System.Convert.ToInt32(doveNum.text)).ToString()).Append(",");
     }
 
     public GameObject spawnPrefab(GameObject prefab)
@@ -264,6 +283,10 @@ public class GameManager : MonoBehaviour
         {
             m_DataDiagram.InputPoint(l, new Vector2(index++, Random.value * 4f));
         }
+
+        sb.Append(howkCount.ToString()).Append(",");
+        sb.Append(doveCount.ToString()).Append(",");
+        sb.Append((howkCount + doveCount).ToString()).Append(",");
     }
 
     public void Btn_Complete_Click()
@@ -282,6 +305,10 @@ public class GameManager : MonoBehaviour
         injury.enabled = true;
         bluffing.enabled = true;
         baseReq.enabled = true;
+
+        btn_Next.enabled = false;
+        btn_Stop.enabled = false;
+        btn_Start.enabled = true;
     }
 
     public void reproduction(string agent, int energy)
@@ -315,41 +342,41 @@ public class GameManager : MonoBehaviour
             lineList.Add(line);
     }
 
-    private void WriteToCSV(string fileName, string howkCount, string doveCount, string totalCount)
+    public void SaveProject()
     {
-        StringBuilder sb = new StringBuilder();
-        string result = "";
-        FileStream file = null;
-        if (!File.Exists(fileName))
+        SaveFileDlg pth = new SaveFileDlg();
+        pth.structSize = Marshal.SizeOf(pth);
+        pth.filter = "All files (*.*)|*.*";
+        pth.file = new string(new char[256]);
+        pth.maxFile = pth.file.Length;
+        pth.fileTitle = new string(new char[64]);
+        pth.maxFileTitle = pth.fileTitle.Length;
+        pth.initialDir = Application.dataPath; 
+        pth.title = "Save Project";
+        pth.defExt = "dat";
+        pth.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;
+        if (SaveFileDialog.GetSaveFileName(pth))
         {
-            file = new FileStream(fileName, FileMode.CreateNew);
-            sb.Append("Howk");
-            sb.Append("Dove");
-            sb.Append("Total");
-            result = sb.ToString().Substring(0, sb.ToString().Length - 2);
+            string filepath = pth.file; 
+            Debug.Log(filepath);
+
+            StreamWriter sw = new StreamWriter(filepath);
+
+
+            string result = sb.ToString().Substring(0, sb.ToString().Length - 1);
+            string[] s = result.Split(',');
+            for(int i = 0; i < s.Count()/3; i++)
+            {
+                sw.WriteLine(s[i * 3] + "," + s[i * 3 + 1] + "," + s[i * 3 + 2]);
+            }
+            
+            sw.Flush();
+            sw.Close();
         }
-        else
-        {
-            file = new FileStream(fileName, FileMode.Append);
-        }
-
-        StreamWriter sw = new StreamWriter(file);
-        if(result != "")
-        {
-            sw.WriteLine(result);
-        }
-
-        sb.Clear();
-
-        sb.Append(howkCount);
-        sb.Append(doveCount);
-        sb.Append(totalCount);
-
-        result = sb.ToString().Substring(0, sb.ToString().Length - 2);
-
-        sw.WriteLine(result);
-        sw.Flush();
-        sw.Close();
     }
 
+    public void Quit()
+    {
+        Application.Quit();
+    }
 }
