@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.IO;
 
 public class GameManager : MonoBehaviour
 {
@@ -25,6 +26,10 @@ public class GameManager : MonoBehaviour
     public TMP_InputField injury;
     public TMP_InputField bluffing;
     public TMP_InputField baseReq;
+
+    public Button btn_Start;
+    public Button btn_Next;
+    public Button btn_Stop;
 
     public int foodValueInt;
     public int injuryInt;
@@ -52,6 +57,8 @@ public class GameManager : MonoBehaviour
         AddALine();
         AddALine();
         AddALine();
+
+        
     }
 
     private bool updateSwitch = false;
@@ -306,6 +313,43 @@ public class GameManager : MonoBehaviour
         GameObject line = m_DataDiagram.AddLine(color.ToString(), color);
         if (null != line)
             lineList.Add(line);
+    }
+
+    private void WriteToCSV(string fileName, string howkCount, string doveCount, string totalCount)
+    {
+        StringBuilder sb = new StringBuilder();
+        string result = "";
+        FileStream file = null;
+        if (!File.Exists(fileName))
+        {
+            file = new FileStream(fileName, FileMode.CreateNew);
+            sb.Append("Howk");
+            sb.Append("Dove");
+            sb.Append("Total");
+            result = sb.ToString().Substring(0, sb.ToString().Length - 2);
+        }
+        else
+        {
+            file = new FileStream(fileName, FileMode.Append);
+        }
+
+        StreamWriter sw = new StreamWriter(file);
+        if(result != "")
+        {
+            sw.WriteLine(result);
+        }
+
+        sb.Clear();
+
+        sb.Append(howkCount);
+        sb.Append(doveCount);
+        sb.Append(totalCount);
+
+        result = sb.ToString().Substring(0, sb.ToString().Length - 2);
+
+        sw.WriteLine(result);
+        sw.Flush();
+        sw.Close();
     }
 
 }

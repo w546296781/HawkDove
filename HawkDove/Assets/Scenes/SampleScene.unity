@@ -14515,6 +14515,9 @@ MonoBehaviour:
   injury: {fileID: 1708208461}
   bluffing: {fileID: 683557555}
   baseReq: {fileID: 1959199016}
+  btn_Start: {fileID: 1601086572}
+  btn_Next: {fileID: 201054916}
+  btn_Stop: {fileID: 1856701545}
   foodValueInt: 0
   injuryInt: 0
   bluffingInt: 0
