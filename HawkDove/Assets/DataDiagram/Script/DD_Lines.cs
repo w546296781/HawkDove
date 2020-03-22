@@ -53,14 +53,12 @@ public class DD_Lines : DD_DrawGraphic {
             Debug.Log(this + "null == m_Coordinate");
         }
 
-        //GameObject parent = gameObject.transform.parent ? gameObject.transform.parent.gameObject : null;
-        GameObject parent = gameObject.transform.parent.gameObject;
-        if (null == parent) {
+        GameObject parent = gameObject.transform.parent ? gameObject.transform.parent.gameObject : null;
+        if(null == parent) {
             Debug.Log(this + "null == parent");
         }
 
-        //RectTransform parentrt = parent ? parent.GetComponent<RectTransform>() : null;
-        RectTransform parentrt = parent.GetComponent<RectTransform>();
+        RectTransform parentrt = parent? parent.GetComponent<RectTransform>():null;
         RectTransform localrt = gameObject.GetComponent<RectTransform>();
         if ((null == localrt) || (null == parentrt)) {
             Debug.Log(this + "null == localrt || parentrt");

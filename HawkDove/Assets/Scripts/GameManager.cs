@@ -81,7 +81,10 @@ public class GameManager : MonoBehaviour
                 updateIndex++;
             }
             if (updateIndex == 100)
+            {
                 updateSwitch = false;
+                updateIndex = 0;
+            }
         }
     }
 
@@ -144,6 +147,7 @@ public class GameManager : MonoBehaviour
         sb.Append(hawkNum.text).Append(",");
         sb.Append(doveNum.text).Append(",");
         sb.Append((System.Convert.ToInt32(hawkNum.text) + System.Convert.ToInt32(doveNum.text)).ToString()).Append(",");
+
     }
 
     public GameObject spawnPrefab(GameObject prefab)
@@ -279,9 +283,22 @@ public class GameManager : MonoBehaviour
         if (null == m_DataDiagram)
             return;
 
+        int j = 0;
         foreach (GameObject l in lineList)
         {
-            m_DataDiagram.InputPoint(l, new Vector2(index++, Random.value * 4f));
+            if (j == 0)
+            {
+                m_DataDiagram.InputPoint(l, new Vector2(1,(float)(howkCount/10.0)));
+            }
+            else if(j == 1)
+            {
+                m_DataDiagram.InputPoint(l, new Vector2(1, (float)(doveCount / 10.0)));
+            }
+            else
+            {
+                m_DataDiagram.InputPoint(l, new Vector2(1, (float)((howkCount+doveCount) / 10.0)));
+            }
+            j++;
         }
 
         sb.Append(howkCount.ToString()).Append(",");
@@ -379,4 +396,61 @@ public class GameManager : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void Btn_Open_Click()
+    {
+        OpenFileDlg pth = new OpenFileDlg();
+        pth.structSize = Marshal.SizeOf(pth);
+        pth.filter = "All files (*.*)|*.*";
+        pth.file = new string(new char[256]);
+        pth.maxFile = pth.file.Length;
+        pth.fileTitle = new string(new char[64]);
+        pth.maxFileTitle = pth.fileTitle.Length;
+        pth.initialDir = Application.dataPath.Replace("/", "\\") + "\\Resources"; 
+        pth.title = "Open Project";
+        pth.defExt = "dat";
+        pth.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;
+        if (OpenFileDialog.GetOpenFileName(pth))
+        {
+            string filepath = pth.file; 
+            Debug.Log(filepath);
+            StreamReader sr = new StreamReader(filepath);
+            sr.ReadLine();
+            string input = sr.ReadToEnd();
+            string[] s = input.Split('\r');
+            StringBuilder sb2 = new StringBuilder();
+            for(int i = 0; i < s.Count(); i++)
+            {
+                string[] ss = s[i].Split(',');
+                if (ss.Count() < 3)
+                    break;
+                int j = 0;
+                foreach (GameObject l in lineList)
+                {
+                    if (j == 0)
+                    {
+                        Debug.Log(System.Convert.ToInt32(ss[0]));
+                        m_DataDiagram.InputPoint(l, new Vector2(1, (float)(System.Convert.ToInt32(ss[0].ToString()) / 10.0)));
+                        Debug.Log(System.Convert.ToInt32(ss[0]));
+                    }
+                    else if (j == 1)
+                    {
+                        Debug.Log(System.Convert.ToInt32(ss[1]));
+                        m_DataDiagram.InputPoint(l, new Vector2(1, (float)(System.Convert.ToInt32(ss[1].ToString()) / 10.0)));
+                        Debug.Log(System.Convert.ToInt32(ss[1]));
+                    }
+                    else
+                    {
+                        Debug.Log(System.Convert.ToInt32(ss[2]));
+                        m_DataDiagram.InputPoint(l, new Vector2(1, (float)(System.Convert.ToInt32(ss[2].ToString()) / 10.0)));
+                        Debug.Log(System.Convert.ToInt32(ss[2]));
+                    }
+                    j++;
+                }
+            }
+
+        }
+
+    }
+
 }
