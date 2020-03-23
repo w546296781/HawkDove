@@ -84,6 +84,7 @@ public class GameManager : MonoBehaviour
             {
                 updateSwitch = false;
                 updateIndex = 0;
+                AutoSave();
             }
         }
     }
@@ -326,6 +327,7 @@ public class GameManager : MonoBehaviour
         btn_Next.enabled = false;
         btn_Stop.enabled = false;
         btn_Start.enabled = true;
+        AutoSave();
     }
 
     public void reproduction(string agent, int energy)
@@ -451,6 +453,26 @@ public class GameManager : MonoBehaviour
 
         }
 
+    }
+
+    public void AutoSave()
+    {
+        string pathTime = System.DateTime.Now.ToString("ddMMyyhhmmss");
+        string filepath = "Data/" + pathTime + ".csv";
+        Debug.Log(filepath);
+
+        StreamWriter sw = new StreamWriter(filepath);
+
+
+        string result = sb.ToString().Substring(0, sb.ToString().Length - 1);
+        string[] s = result.Split(',');
+        for (int i = 0; i < s.Count() / 3; i++)
+        {
+            sw.WriteLine(s[i * 3] + "," + s[i * 3 + 1] + "," + s[i * 3 + 2]);
+        }
+
+        sw.Flush();
+        sw.Close();
     }
 
 }
