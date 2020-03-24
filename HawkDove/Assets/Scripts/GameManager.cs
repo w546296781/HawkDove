@@ -75,12 +75,12 @@ public class GameManager : MonoBehaviour
     {
         if (updateSwitch)
         {
-            if (updateIndex < 100)
+            if (updateIndex < 1000)
             {
                 Btn_Next_Click();
                 updateIndex++;
             }
-            if (updateIndex == 100)
+            if (updateIndex == 1000)
             {
                 updateSwitch = false;
                 updateIndex = 0;
@@ -185,6 +185,8 @@ public class GameManager : MonoBehaviour
                 agents.Add(go);
             }
         }
+
+        Debug.Log(foods.Count());
         while (agents.Count > 0)
         {
             if (foods.Count > 0)
@@ -240,9 +242,9 @@ public class GameManager : MonoBehaviour
                     }
                     agents.RemoveAt(0);
                 }
-                int random3 = Random.Range(0, foods.Count - 1);
+                int random3 = Random.Range(0, foods.Count() - 1);
                 GameObject.DestroyImmediate(foods[random3]);
-                foods.RemoveAt(0);
+                foods.RemoveAt(random3);
             }
             else
             {
@@ -263,6 +265,8 @@ public class GameManager : MonoBehaviour
             }
                 
         }
+
+        Debug.Log(foods.Count());
 
         int howkCount = 0;
         int doveCount = 0;
